@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,13 +24,56 @@ namespace SchoolManager
 
             students.Add(o);
         }
+        public void ListStudentAll()
+        {
+            Console.WriteLine();
+            Console.WriteLine(" 1- Tüm öğrencileri listele ");
+            Console.WriteLine();
+
+            if (students == null || students.Count == 0)
+            {
+                Console.WriteLine("Henüz sisteme kayıtlı öğrenci bulunmamaktadır.");
+                return;
+            }
+
+            Console.WriteLine("Şube".PadRight(10) + "No".PadRight(10) + "Ad".PadRight(10) + "Soyad".PadRight(12) + "Ortalama".PadRight(15) + "Oku. Kitap Say.");
+            Console.WriteLine(new string('-', 80));
+
+            foreach (var student in students.OrderBy(o => o.Branch).ThenBy(o => o.Number))
+            {
+                Console.WriteLine(Convert.ToString(student.Branch).PadRight(10) + Convert.ToString(student.Number).PadRight(10)
+                    + Convert.ToString(student.Name).PadRight(10) + Convert.ToString(student.Surname).PadRight(12)
+                    + Convert.ToString(student.Average).PadRight(18) + Convert.ToString(student.Books.Count));
+            }
+
+        }
+        public void LastBookReadOfStudent()
+        {
+            Console.WriteLine("14 - Öğrencinin okuduğu son kitabı gör\n");
+            Console.Write("Öğrenci Numarası : ");
+            int no = int.Parse(Console.ReadLine());
+            var studentBranch = School.students.FirstOrDefault(o => o.Number == no);
+
+            if (studentBranch == null)
+            {
+                Console.WriteLine("Bu numaraya sahip bir öğrenci bulunamadı.");
+                return;
+            }
+
+            if (studentBranch.Books == null || !studentBranch.Books.Any())
+            {
+                Console.WriteLine(studentBranch.Name + " " + studentBranch.Surname + " 'in okuduğu herhangi bir kitap bulunmamaktadır.");
+                return;
+            }
+            Console.WriteLine(studentBranch.Name + " " + studentBranch.Surname + " 'in okuduğu son kitap: " + studentBranch.Books.Last());
+        }
         public void ListStudentByBranch()
         {
             Console.WriteLine();
             Console.WriteLine(" 2- Şubeye Göre Öğrenci Listele ");
             Console.WriteLine();
 
-            Console.Write("Listelemek istediğiniz  şubeyi girin (A/B/C): ");
+            Console.Write("Listelemek istediğiniz  şubeyi girin (A-B-C): ");
             string branchs = Console.ReadLine().ToUpper();
             BRANCH branch;
             if (!Enum.TryParse(branchs, out branch) || branch == BRANCH.Empty)
@@ -53,7 +96,7 @@ namespace SchoolManager
             Console.WriteLine();
             Console.WriteLine("3 - Cinsiyetine göre öğrencileri listele");
             Console.WriteLine();
-            Console.WriteLine("Listelemek istediğiniz  cinsiyeti girin (Kız için K /Erkek için E): ");
+            Console.Write("Listelemek istediğiniz  cinsiyeti girin (K/E): ");
             string inputGender = Console.ReadLine().ToUpper();
             GENDER gender;
 
@@ -67,19 +110,19 @@ namespace SchoolManager
             }
             else
             {
-                Console.WriteLine("Geçersiz bir cinsiyet girdiniz!");
+                Console.WriteLine("Geçersiz bir değer girdiniz!");
                 return;
             }
 
             Console.WriteLine("Cinsiyet: " + gender);
 
-            Console.WriteLine("Şube".PadRight(10) + "No".PadRight(8) + "Adı".PadRight(10) + "Soyadı".PadRight(15) + "Not Ort".PadRight(20) + "Okuduğu Kitap Say.");
-            Console.WriteLine(new string('-', 60));
+            Console.WriteLine("Şube".PadRight(10) + "No".PadRight(12) + "Adı".PadRight(12) + "Soyadı".PadRight(15) + "Not Ort".PadRight(12) + "Oku. Kitap Say.");
+            Console.WriteLine(new string('-', 80));
 
             var chooseStudent = students.Where(o => o.Gender == gender).OrderBy(o => o.Number).ToList();
             foreach (var ogr in chooseStudent)
             {
-                Console.WriteLine(ogr.Branch.ToString().PadRight(10) + ogr.Number.ToString().PadRight(8) + ogr.Name.PadRight(15) + ogr.Surname.PadRight(10) + ogr.Average.ToString().PadRight(10) + ogr.Books.Count);
+                Console.WriteLine(ogr.Branch.ToString().PadRight(10) + ogr.Number.ToString().PadRight(10) + ogr.Name.PadRight(15) + ogr.Surname.PadRight(15) + ogr.Average.ToString().PadRight(12) + ogr.Books.Count);
             }
 
         }
@@ -88,7 +131,7 @@ namespace SchoolManager
             Console.WriteLine();
             Console.WriteLine("4 - Şu tarihten sonra doğan öğrencileri listele");
             Console.WriteLine();
-            Console.WriteLine("Hangi tarihten sonraki öğrencileri listelemek  istersiniz (gg.aa.yyyy):");
+            Console.Write("Hangi tarihten sonraki öğrencileri listelemek  istersiniz (gg.aa.yyyy):");
 
             string inputDate = Console.ReadLine();
             DateTime date;
@@ -97,15 +140,15 @@ namespace SchoolManager
             {
                 Console.WriteLine("Hatalı tarih girdiniz.");
             }
-
+            Console.WriteLine();
             Console.WriteLine(date.ToShortDateString() + "tarihinden sonra doğan öğrenciler:");
-            Console.WriteLine("Şube".PadRight(10) + "Numara".PadRight(10) + "Ad".PadRight(10) + "Soyad".PadRight(10) + "Ortalama" + "Okuduğu Kitap Sayısı");
-            Console.WriteLine(new string('-', 60));
+            Console.WriteLine("Şube".PadRight(10) + "Numara".PadRight(10) + "Ad".PadRight(10) + "Soyad".PadRight(10) + "Doğum Tarihi".PadRight(15) + "Ortalama".PadRight(10) + "Oku. Kitap Say.");
+            Console.WriteLine(new string('-', 80));
 
             var ogrenciler = School.students.Where(o => o.Birthday > date);
             foreach (var ogr in ogrenciler)
             {
-                Console.WriteLine(ogr.Branch.ToString().PadRight(10) + ogr.Number.ToString().PadRight(8) + ogr.Name.PadRight(15) + ogr.Surname.PadRight(10) + ogr.Average.ToString().PadRight(10) + ogr.Books.Count);
+                Console.WriteLine(ogr.Branch.ToString().PadRight(10) + ogr.Number.ToString().PadRight(10) + ogr.Name.PadRight(10) + ogr.Surname.PadRight(10) + ogr.Birthday.ToShortDateString().ToString().PadRight(15) + ogr.Average.ToString().PadRight(10) + ogr.Books.Count);
             }
         }
         public void ListStudentByCity()
@@ -113,14 +156,13 @@ namespace SchoolManager
             Console.WriteLine();
             Console.WriteLine("5- İllere göre öğrencileri Listele");
             Console.WriteLine();
-            Console.WriteLine("Şube".PadRight(8) + "No".PadRight(8) + "Adı".PadRight(8) + "Soyadı".PadRight(8) + "Şehir".PadRight(8) + "Semt");
-            Console.WriteLine(new string('-', 60));
+            Console.WriteLine("Şube".PadRight(10) + "No".PadRight(10) + "Adı".PadRight(12) + "Soyadı".PadRight(12) + "il".PadRight(12) + "İlçe");
+            Console.WriteLine(new string('-', 65));
 
             var students = School.students.Where(o => o.Adress != null).OrderBy(o => o.Adress.City);
             foreach (var std in students)
             {
-                Console.WriteLine(std.Branch.ToString().PadRight(8) + std.Number.ToString().PadRight(8) + std.Name + std.Surname.PadRight(10) + std.Adress.City.PadRight(10) + std.Adress.Distritch);
-
+                Console.WriteLine(std.Branch.ToString().PadRight(10) + std.Number.ToString().PadRight(10) + std.Name.PadRight(12) + std.Surname.PadRight(12) + std.Adress.City.PadRight(12) + std.Adress.Distritch);
             }
         }
         public void ListStudentNotes()
@@ -134,11 +176,9 @@ namespace SchoolManager
                 return;
             }
 
-            Console.WriteLine(new string('-', 60));
-
             foreach (var std in students)
             {
-                Console.WriteLine("Öğrenci No: " + std.Number + ", Ad: " + std.Name + ", Soyad: " + std.Surname);
+                Console.WriteLine("Öğrenci No: " + std.Number + " | Ad-Soyad : " + std.Name + " " + std.Surname);
 
                 if (student.Notes.Count > 0)
                 {
@@ -151,76 +191,80 @@ namespace SchoolManager
                 }
                 else
                 {
-                    Console.WriteLine("Bu öğrencinin henüz notu bulunmamaktadır.");
+                    Console.WriteLine("Bu öğrencinin henüz notu bulunmamaktadır.\n");
                 }
-
-                Console.WriteLine(new string('-', 60));
             }
         }
         public void ListStudentBook()
         {
-            Console.WriteLine("7 - Öğrencinin okuduğu kitapları listele");
+            Console.WriteLine("\n7 - Öğrencinin okuduğu kitapları listele");
             Console.WriteLine();
-            Console.Write("Ögrenci numarası giriniz: ");
+            Console.Write("Numara : ");
+
             if (int.TryParse(Console.ReadLine(), out int no))
             {
                 var studentBook = School.students.FirstOrDefault(o => o.Number == no);
+
                 if (studentBook != null)
                 {
-                    Console.WriteLine("Öğrencinin Adı Soyadı: " + studentBook.Name + studentBook.Surname);
-                    Console.WriteLine("Öğrencinin Şubesi: " + studentBook.Branch);
-                    Console.WriteLine("Okuduğu Kitaplar:");
-                    Console.WriteLine(new string('-', 20));
+                    Console.WriteLine("Ad-Soyadı : " + studentBook.Name + " " + studentBook.Surname);
+                    Console.WriteLine("Şube : " + studentBook.Branch);
 
-                    foreach (var book in student.Books)
+                    // Kitap listesini kontrol et
+                    if (studentBook.Books != null && studentBook.Books.Any())
                     {
-                        Console.WriteLine(book);
+                        Console.WriteLine("Okuduğu Kitaplar:");
+                        Console.WriteLine(new string('-', 18));
+
+                        foreach (var book in studentBook.Books)
+                        {
+                            Console.WriteLine(" + " + book);
+                        }
                     }
-                    if (!student.Books.Any())
+                    else
                     {
                         Console.WriteLine("Bu öğrencinin henüz kitap kaydı bulunmamaktadır.");
                     }
-
                 }
                 else
                 {
-                    Console.WriteLine("Geçerli bir numara giriniz");
+                    Console.WriteLine("Bu numaraya sahip bir öğrenci bulunamadı. Lütfen geçerli bir numara giriniz.");
                 }
+            }
+            else
+            {
+                Console.WriteLine("Geçerli bir öğrenci numarası giriniz.");
             }
         }
         public void StudentListSuccessfullTopFive()
         {
-            Console.WriteLine("8- En Yüksek Notlu 5 Öğrenciyi Listele");
-            Console.WriteLine();
-            Console.WriteLine("No".PadRight(10) + "Ad".PadRight(15) + "Soyad".PadRight(15) + "Ortalama".PadRight(10));
+            Console.WriteLine("8- En Yüksek Notlu 5 Öğrenciyi Listele\n");
+            Console.WriteLine("No".PadRight(10) + "Şube".PadRight(10) + "Ad".PadRight(12) + "Soyad".PadRight(12) + "Ortalama");
             Console.WriteLine(new string('-', 60));
-            var ogrenciler = School.students.OrderByDescending(o => o.Average).Take(5).ToList();
-            foreach (var ogr in ogrenciler)
+            var studentTopFive = School.students.OrderByDescending(o => o.Average).Take(5).ToList();
+            foreach (var std in studentTopFive)
             {
-                Console.WriteLine(ogr.Number.ToString().PadRight(8) + ogr.Name.PadRight(15) +
-                    ogr.Surname.PadRight(10) + ogr.Average.ToString().PadRight(10));
-
+                Console.WriteLine(std.Number.ToString().PadRight(10) + std.Branch.ToString().PadRight(10) + std.Name.PadRight(12) +
+                    std.Surname.PadRight(10) + std.Average.ToString());
             }
 
         }
         public void StudentListUnsuccessfullTopThree()
         {
-            Console.WriteLine("9 - Okuldaki en düşük notlu 3 öğrenciyi listele");
-            Console.WriteLine();
+            Console.WriteLine("9 - Okuldaki en düşük notlu 3 öğrenciyi listele\n");
 
-            Console.WriteLine("Şube".PadRight(10) + "No".PadRight(10) + "Ad".PadRight(15) + "Soyad".PadRight(15) + "Ortalama");
+            Console.WriteLine("Şube".PadRight(10) + "No".PadRight(10) + "Şube".PadRight(10) + "Ad".PadRight(12) + "Soyad".PadRight(12) + "Ortalama");
             Console.WriteLine(new string('-', 60));
-            var ogrenciler = School.students.OrderBy(o => o.Average).Take(3).ToList();
-            foreach (var ogr in ogrenciler)
+            var studentDescThree = School.students.OrderBy(o => o.Average).Take(3).ToList();
+            foreach (var std in studentDescThree)
             {
-                Console.WriteLine(ogr.Branch.ToString().PadRight(10) + ogr.Number.ToString().PadRight(8) + ogr.Name.PadRight(15) + ogr.Surname.PadRight(10) + ogr.Average.ToString().PadRight(10));
+                Console.WriteLine(std.Branch.ToString().PadRight(10) + std.Number.ToString().PadRight(10) + std.Branch.ToString().PadRight(10) + std.Name.PadRight(12) + std.Surname.PadRight(12) + std.Average.ToString().PadRight(10));
             }
         }
         public void StudentListSuccessfullTopFiveByBranch()
         {
             Console.WriteLine();
-            Console.WriteLine("10 - Şubedeki en yüksek  notlu 5 öğrenciyi listele");
-            Console.WriteLine();
+            Console.WriteLine("10 - Şubedeki en yüksek  notlu 5 öğrenciyi listele\n");
 
             Console.Write("Listelemek istediğiniz şubeyi girin (A-B-C):");
             string inputBranch = Console.ReadLine().ToUpper();
@@ -245,8 +289,7 @@ namespace SchoolManager
         }
         public void StudentListUnsuccessfullTopThreeByBranch()
         {
-            Console.WriteLine("11 - Şubedeki en düşük notlu 3 öğrenciyi listele");
-            Console.WriteLine();
+            Console.WriteLine("11 - Şubedeki en düşük notlu 3 öğrenciyi listele\n");
 
             Console.Write("Listelemek istediğiniz şubeyi girin (A-B-C):");
             string inputBranch = Console.ReadLine().ToUpper();
@@ -274,9 +317,8 @@ namespace SchoolManager
         {
             int no;
 
-            Console.WriteLine("12 - Öğrencinin not ortalamasını gör");
-            Console.WriteLine();
-            Console.WriteLine("Öğrencinin Numarası:");
+            Console.WriteLine("\n12 - Öğrencinin not ortalamasını gör\n");
+            Console.Write("Numara : ");
 
             if (!int.TryParse(Console.ReadLine(), out no))
             {
@@ -289,38 +331,54 @@ namespace SchoolManager
                 Console.WriteLine("Bu numarada öğrenci yok.");
                 return;
             }
-            Console.WriteLine("\nÖğrencinin Adı Soyadı:" + std.Name + std.Surname);
-            Console.WriteLine("Öğrencinin Şubesi:" + std.Branch);
-            Console.WriteLine("Öğrencinin not ortalaması" + std.Average);
+            Console.WriteLine("\nAd-Soyad : " + std.Name + " " + std.Surname);
+            Console.WriteLine("Şube : " + std.Branch);
+            Console.WriteLine("Not Ortalaması : " + std.Average);
 
         }
         public void BranchNoteAverage()
         {
-            Console.WriteLine("13 - Şubenin not ortalamasını gör");
-            Console.WriteLine();
-            Console.Write("Bir Şube Seçin (A-B-C) : ");
+            Console.WriteLine("\n13 - Şubenin not ortalaması\n");
 
-            string inputBranch = Console.ReadLine();
+            Console.Write("Bir Şube Seçin (A-B-C) : ");
+            string inputBranch = Console.ReadLine().ToUpper();
+            if (Enum.TryParse(inputBranch, out BRANCH branch))
+            {
+                var studentByBranch = School.students.Where(o => o.Branch == branch).ToList();
+                if (studentByBranch.Any())
+                {
+                    Console.WriteLine("\nŞube".PadRight(10) + "No".PadRight(10) + "Ad".PadRight(15) + "Soyad".PadRight(15) + "Not Ortalaması".PadRight(15));
+                    Console.WriteLine(new string('-', 65));
+
+                    foreach (var student in studentByBranch)
+                    {
+                        Console.WriteLine(
+                            student.Branch.ToString().PadRight(10) + student.Number.ToString().PadRight(10) + student.Name.PadRight(15) + student.Surname.PadRight(15) + student.Average.ToString()
+                        );
+                    }
+                }
+            }
+
         }
         public void StudentsAdd()
         {
             Student o = new Student();
 
             Console.WriteLine();
-            Console.WriteLine("15- Öğrenci ekle");
+            Console.WriteLine("15- Öğrenci Ekle");
             Console.WriteLine();
-            Console.WriteLine(students.Count + 1 + " . öğrencin");
+            Console.WriteLine(students.Count + 1 + " . öğrencin bilgilerini giriniz");
 
             bool presentNo;
             do
             {
                 presentNo = false;
-                Console.Write("Numarası: ");
+                Console.Write("Numara : ");
 
 
                 if (!int.TryParse(Console.ReadLine(), out o.Number))
                 {
-                    Console.WriteLine("Geçersiz numara. Lütfen geçerli bir numara giriniz.");
+                    Console.WriteLine("Hatalı numara formatı. Lütfen geçerli bir numara giriniz.");
                     return;
                 }
 
@@ -330,22 +388,22 @@ namespace SchoolManager
                     if (ogr.Number == o.Number)
                     {
                         presentNo = true;
-                        Console.WriteLine("Bu numara zaten mevcut! Lütfen farklı bir numara giriniz.");
+                        Console.WriteLine("Bu numarada öğrenci zaten mevcut! Lütfen farklı bir numara giriniz.");
                         break;
                     }
                 }
             } while (presentNo);
 
 
-            Console.Write("Adı: ");
+            Console.Write("Ad : ");
             o.Name = Console.ReadLine();
 
-            Console.Write("Soyadı: ");
+            Console.Write("Soyad : ");
             o.Surname = Console.ReadLine();
 
 
             DateTime addBirthday;
-            Console.Write("Doğum tarihi (gg.aa.yyyy): ");
+            Console.Write("Doğum tarihi (gg.aa.yyyy) : ");
             while (!DateTime.TryParse(Console.ReadLine(), out addBirthday))
             {
                 Console.WriteLine("Geçersiz tarih. Lütfen belirtilen formatta tarih giriniz (gg.aa.yyyy): ");
@@ -353,13 +411,14 @@ namespace SchoolManager
             o.Birthday = addBirthday;
 
 
-            Console.Write("Öğrencinin cinsiyeti (K/E): ");
+            Console.Write("Cinsiyet (K/E) : ");
             string inputGender = Console.ReadLine().ToUpper();
 
             GENDER addGender;
 
             if (inputGender == "K")
                 addGender = GENDER.Kiz;
+
             else if (inputGender == "E")
                 addGender = GENDER.Erkek;
             else
@@ -369,18 +428,18 @@ namespace SchoolManager
             }
 
 
-            Console.Write("Öğrencinin şubesi (A/B/C): ");
+            Console.Write("Şube (A/B/C) : ");
             string inputBranch = Console.ReadLine().ToUpper();
 
             if (!Enum.TryParse(inputBranch, out BRANCH branch) || branch == BRANCH.Empty)
             {
-                Console.WriteLine("Hatalı şube girdiniz. Öğrenci eklenemedi.");
+                Console.WriteLine("Hatalı şube girdiniz.");
                 return;
             }
             else
             {
                 Console.WriteLine();
-                Console.WriteLine("Ögrenci başarıyla eklendi. Ana menüye yönlendiriliyorsunuz...");
+                Console.WriteLine("Ögrenci başarıyla eklendi.\n");
             }
 
 
@@ -401,82 +460,108 @@ namespace SchoolManager
             Console.WriteLine();
             Console.WriteLine("16- Öğrenci Güncelle");
             Console.WriteLine();
-            Console.WriteLine("Öğrencinin numarası:");
+            Console.Write("Numara: ");
 
             if (!int.TryParse(Console.ReadLine(), out no))
             {
-                Console.Write("Geçersiz numara.");
+                Console.WriteLine("Geçersiz numara.");
                 return;
             }
 
             var std = students.FirstOrDefault(o => o.Number == no);
             if (std == null)
             {
-                Console.WriteLine("Bu numarada öğrenci var"); return;
+                Console.WriteLine("Bu numarada öğrenci mevcut değil. Başka bir numara giriniz.");
+                return;
             }
 
-            Console.Write("Öğrencinin Adı:");
+            Console.Write("Ad: ");
             string name = Console.ReadLine();
 
-            Console.Write("Öğrencinin Soyadı:");
+            Console.Write("Soyad: ");
             string surname = Console.ReadLine();
 
-            Console.Write("Öğrencinin Doğum tarihi (gg.aa.yyyy):");
-            DateTime birhtday;
-
-            if (!DateTime.TryParse(Console.ReadLine(), out birhtday)) ;
+            DateTime birthday;
+            while (true)
             {
-                Console.WriteLine("Geçersiz Tarih"); return;
+                Console.Write("Doğum tarihi (gg.aa.yyyy) : ");
+                if (DateTime.TryParse(Console.ReadLine(), out birthday))
+                {
+                    break;
+                }
+                Console.WriteLine("Geçersiz tarih. Lütfen tekrar deneyin.");
             }
 
             GENDER gender;
             while (true)
             {
-                Console.Write("Ögrencinin cinsiyeti (K/E):");
+                Console.Write("Öğrencinin cinsiyeti (K/E): ");
                 string inputGender = Console.ReadLine().ToUpper();
                 if (inputGender == "K")
                 {
-                    student.Gender = GENDER.Kiz;
+                    gender = GENDER.Kiz;
+                    break;
                 }
-
-                if (inputGender == "E")
+                else if (inputGender == "E")
                 {
-                    student.Gender = GENDER.Erkek;
+                    gender = GENDER.Erkek;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Geçersiz cinsiyet. Lütfen K veya E şeklinde giriniz.");
                 }
             }
 
+            std.Name = name;
+            std.Surname = surname;
+            std.Birthday = birthday;
+            std.Gender = gender;
 
+            Console.WriteLine("Öğrenci bilgileri başarıyla güncellendi.");
         }
         public void StudentDelete()
         {
             Console.WriteLine();
-            Console.WriteLine("17- Öğrenci sil");
+            Console.WriteLine("17- Öğrenci Sil");
             Console.WriteLine();
-            Console.Write("silmek istediğiniz öğrencinin numarasını giriniz:");
-            if (int.TryParse(Console.ReadLine(), out int number))
+
+            while (true)
             {
-                var ogrenci = students.FirstOrDefault(o => o.Number == number);
-                if (ogrenci != null)
+                Console.Write("Öğrenci Numarası: ");
+                if (int.TryParse(Console.ReadLine(), out int number))
                 {
-                    students.Remove(ogrenci);
-                    Console.WriteLine("Öğrenci" + ogrenci.Name + ogrenci.Surname + " başarıyla silindi.");
+                    var ogrenci = students.FirstOrDefault(o => o.Number == number);
+                    if (ogrenci != null)
+                    {
+                        Console.Write(ogrenci.Name + " " + ogrenci.Surname + " silinecektir! Emin misin (E/H): ");
+                        string inputDelete = Console.ReadLine().ToUpper();
+                        if (inputDelete == "E")
+                        {
+                            students.Remove(ogrenci);
+                            Console.WriteLine(ogrenci.Name + " " + ogrenci.Surname + " başarıyla silindi.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Öğrenci silme işlemi iptal edildi.");
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Bu numaraya sahip bir öğrenci bulunamadı. Lütfen tekrar deneyin.");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Bu numaraya sahip bir öğrenci bulunamadı.");
+                    Console.WriteLine("Geçerli bir öğrenci numarası giriniz.");
                 }
             }
-            else
-            {
-                Console.WriteLine("Geçerli bir öğrenci numarası giiniz.");
-            }
-
-
         }
+
         public void InputNoteofStudent()
         {
-            Console.WriteLine();
-            Console.WriteLine("20- Öğrencinin notunu gir");
+            Console.WriteLine("\n20- Öğrencinin notunu gir");
             Console.WriteLine();
 
             Console.Write("Öğrencinin numarası: ");
@@ -493,13 +578,13 @@ namespace SchoolManager
                 return;
             }
 
-            Console.WriteLine("Öğrencinin Adı Soyadı:" + std.Name + std.Surname);
-            Console.WriteLine("Öğrencinin Şubesi:" + std.Branch);
+            Console.WriteLine("Ad-Soyad :" + std.Name + std.Surname);
+            Console.WriteLine("Şube :" + std.Branch);
 
             Console.Write("Not eklemek istediğiniz ders: ");
             string lessonName = Console.ReadLine();
 
-            Console.Write("Eklemek istediğiniz not adeti (1-3): ");
+            Console.Write("Eklemek istediğiniz not adeti (1-3) : ");
             if (!int.TryParse(Console.ReadLine(), out int count) || count < 1 || count > 3)
             {
                 Console.WriteLine("En az 1 en fazla 3 adet not girebilirsiniz!");
@@ -539,12 +624,114 @@ namespace SchoolManager
                 Console.WriteLine("Öğrenci bulunamadı.");
                 return;
             }
-            Console.Write("Kitap Adı: ");
+            Console.Write("Kitap Adı : ");
             string bookName = Console.ReadLine();
 
             student.Books.Add(bookName);
             Console.WriteLine(bookName + " kitabı eklendi.");
 
         }
+        public void AddInpuAdress()
+        {
+            Console.WriteLine("\n18 - Öğrenci adres ekleme\n");
+
+            while (true)
+            {
+                Console.Write("Öğrenci Numarası : ");
+                int number = int.Parse(Console.ReadLine());
+
+                var student = School.students.FirstOrDefault(o => o.Number == number);
+                if (student == null)
+                {
+                    Console.WriteLine("Öğrenci bulunamadı.");
+                    return;
+                }
+                Console.Write("İl: ");
+                string City = Console.ReadLine();
+
+                Console.Write("İlçe: ");
+                string district = Console.ReadLine();
+
+                student.Adress = new Adress();
+                Console.WriteLine("Adres başarıyla eklendi.");
+                break;
+            }
+        }
+        public void AddFakeData()
+        {
+            //StudentAdd metodu School class'ında olduğu için school nesnesi üzerinden metodu çağırıldı
+            //Toplam 5 adet sahte öğrenci verisi eklendi.
+            StudentAdd(1, "Ahmet", "Kaya", new DateTime(2002, 1, 15), BRANCH.A, GENDER.Erkek);
+            StudentAdd(2, "Zeynep", "Doğan", new DateTime(2001, 4, 10), BRANCH.B, GENDER.Kiz);
+            StudentAdd(3, "Mehmet", "Yıldız", new DateTime(2003, 6, 18), BRANCH.C, GENDER.Erkek);
+            StudentAdd(4, "Ayşe", "Aydın", new DateTime(2000, 9, 20), BRANCH.A, GENDER.Kiz);
+            StudentAdd(5, "Emre", "Öz", new DateTime(2002, 2, 25), BRANCH.B, GENDER.Erkek);
+
+            //Her öğrenciye Türkçe, Matematik, Fen ve Sosyal ders notları eklendi
+            FakeAddNote(1, "Türkçe", 58);
+            FakeAddNote(1, "Matematik", 72);
+            FakeAddNote(1, "Fen", 60);
+            FakeAddNote(1, "Sosyal", 65);
+
+            FakeAddNote(2, "Türkçe", 85);
+            FakeAddNote(2, "Matematik", 90);
+            FakeAddNote(2, "Fen", 88);
+            FakeAddNote(2, "Sosyal", 92);
+
+            FakeAddNote(3, "Türkçe", 45);
+            FakeAddNote(3, "Matematik", 50);
+            FakeAddNote(3, "Fen", 48);
+            FakeAddNote(3, "Sosyal", 52);
+
+            FakeAddNote(4, "Türkçe", 95);
+            FakeAddNote(4, "Matematik", 88);
+            FakeAddNote(4, "Fen", 92);
+            FakeAddNote(4, "Sosyal", 90);
+
+            FakeAddNote(5, "Türkçe", 70);
+            FakeAddNote(5, "Matematik", 68);
+            FakeAddNote(5, "Fen", 72);
+            FakeAddNote(5, "Sosyal", 75);
+
+            //Her öğrenciye 1 adet kitap eklendi
+            FakeAddBook(1, "Simyacı");
+            FakeAddBook(2, "Kürk Mantolu Madonna");
+            FakeAddBook(3, "Bir İdam Mahkumunun Son Günü");
+            FakeAddBook(4, "Küçük Prens");
+            FakeAddBook(5, "Beyaz Gemi");
+
+            //Her öğrenciye ait il-ilçe adresi tanımlandı
+            FakeAddAdress(1, "İstanbul", "Beşiktaş");
+            FakeAddAdress(2, "Ankara", "Çankaya");
+            FakeAddAdress(3, "İzmir", "Bornova");
+            FakeAddAdress(4, "Bursa", "Nilüfer");
+            FakeAddAdress(5, "Antalya", "Konyaaltı");
+        }
+        public void FakeAddNote(int number, string lessonName, int note)
+        {
+            Student o = students.Where(a => a.Number == number).FirstOrDefault();
+            if (o != null)
+            {
+                o.Notes.Add(new LessonNote(lessonName, note));
+            }
+        }
+        public void FakeAddBook(int number, string kitapAdi)
+        {
+
+            Student o = students.Where(a => a.Number == number).FirstOrDefault();
+            if (o != null)
+            {
+                o.Books.Add(kitapAdi);
+            }
+        }
+        public void FakeAddAdress(int number, string city, string district)
+        {
+            Student o = students.Where(a => a.Number == number).FirstOrDefault();
+            if (o != null)
+            {
+                o.Adress = new Adress { City = city, Distritch = district };
+            }
+        }
+
     }
 }
